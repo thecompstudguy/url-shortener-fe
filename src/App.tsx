@@ -151,7 +151,14 @@ function App() {
               onError={() => setLogoFailed(true)}
             />
           )}
-          <span className="brand-kicker">First release before UniversiTEA</span>
+          <a
+            className="brand-kicker"
+            href="https://github.com/thecompstudguy"
+            target="_blank"
+            rel="noreferrer"
+          >
+            By TheCompSTUDGuy
+          </a>
         </div>
       </header>
 
@@ -163,7 +170,7 @@ function App() {
           </h1>
           <p className="lead">
             Paste a long link, get a short one, and share instantly. Built for the
-            URL Shortener release ahead of UniversiTEA.
+            URL Shortener release, ready for sharing.
           </p>
           <div className="badge-row">
             <span className="badge accent">Instant output</span>
