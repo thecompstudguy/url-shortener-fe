@@ -2,6 +2,8 @@
 
 A URL Shortener frontend that I intend to release before UniversiTEA.
 
+[View on GitHub](https://github.com/thecompstudguy/url-shortener-fe)
+
 ## Author
 
 TheCompSTUDGuy <the.compstud.guy@universitea.shop>
