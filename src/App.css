@@ -120,15 +120,24 @@
 }
 
 .main {
-  margin-top: 48px;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 36px;
-  align-items: center;
+  margin-top: 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
 }
 
 .hero {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
   animation: rise 0.7s ease both;
+}
+
+.hero:last-of-type {
+  animation-delay: 0.15s;
+  gap: 24px;
 }
 
 .eyebrow {
@@ -136,14 +145,15 @@
   text-transform: uppercase;
   letter-spacing: 0.32em;
   color: var(--muted);
-  margin: 0 0 12px;
+  margin: 0;
 }
 
 .hero-title {
   font-family: 'Bebas Neue', sans-serif;
   font-size: clamp(44px, 6vw, 74px);
   letter-spacing: 0.04em;
-  margin: 0 0 16px;
+  line-height: 1.1;
+  margin: 0;
   color: var(--brand-black);
 }
 
@@ -154,13 +164,14 @@
 .lead {
   font-size: 1.05rem;
   color: var(--muted);
-  max-width: 40ch;
-  margin: 0 0 24px;
+  max-width: 46ch;
+  margin: 0 auto;
 }
 
 .badge-row {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 10px;
 }
 
@@ -192,7 +203,7 @@
 .panel {
   background: var(--panel);
   border-radius: var(--radius-xl);
-  padding: 28px;
+  padding: clamp(24px, 6vw, 48px);
   border: 1px solid rgba(26, 18, 12, 0.12);
   position: relative;
   overflow: hidden;
@@ -229,38 +240,38 @@
 
 .input-row {
   display: flex;
-  gap: 12px;
+  gap: 16px;
   align-items: stretch;
   flex-wrap: wrap;
 }
 
 .input-row input {
-  flex: 1 1 240px;
-  padding: 14px 16px;
-  border-radius: 14px;
+  flex: 1 1 300px;
+  padding: 18px 24px;
+  border-radius: 16px;
   border: 1px solid rgba(26, 18, 12, 0.2);
   background: #fff;
-  font-size: 1rem;
-  transition: border-color 0.2s ease;
+  font-size: 1.1rem;
+  transition: all 0.2s ease;
 }
 
 .input-row input:focus {
   outline: none;
   border-color: var(--brand-orange-deep);
-  outline: 2px solid rgba(247, 154, 31, 0.5);
-  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(247, 154, 31, 0.15);
 }
 
 .primary-button {
   border: none;
-  padding: 14px 20px;
-  border-radius: 14px;
+  padding: 18px 36px;
+  border-radius: 16px;
   background: linear-gradient(120deg, var(--brand-orange), var(--brand-orange-deep));
   color: #1a1109;
   font-weight: 800;
+  font-size: 1.05rem;
   cursor: pointer;
   letter-spacing: 0.05em;
-  transition: transform 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .primary-button:hover {
@@ -295,8 +306,8 @@
 }
 
 .result-card {
-  margin-top: 20px;
-  padding: 18px;
+  margin-top: 24px;
+  padding: 24px;
   border-radius: 18px;
   background: var(--brand-black);
   color: #fff;
@@ -360,8 +371,8 @@
 }
 
 .result-placeholder {
-  margin-top: 20px;
-  padding: 18px;
+  margin-top: 24px;
+  padding: 24px;
   border-radius: 18px;
   border: 1px dashed rgba(247, 154, 31, 0.4);
   background: #fff5e8;
@@ -397,10 +408,15 @@
   animation: rise 0.7s ease 0.2s both;
 }
 
+.history-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
 .history-header h2 {
   font-family: 'Bebas Neue', sans-serif;
   letter-spacing: 0.1em;
-  font-size: 2rem;
+  font-size: 2.2rem;
   margin: 0 0 8px;
 }
 
@@ -476,13 +492,50 @@
 }
 
 .footer {
-  margin-top: 32px;
+  margin-top: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(26, 18, 12, 0.08);
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.footer-content {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
   justify-content: space-between;
-  font-size: 0.85rem;
-  color: var(--muted);
+}
+
+.footer-content a {
+  font-weight: 700;
+  color: var(--brand-black);
+  text-decoration: underline;
+  text-decoration-color: rgba(247, 154, 31, 0.4);
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+}
+
+.github-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  background: var(--brand-black);
+  color: #fff !important;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.github-link:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .truncate {
@@ -506,10 +559,6 @@
   .header {
     flex-direction: column;
     align-items: flex-start;
-  }
-
-  .main {
-    grid-template-columns: 1fr;
   }
 }
 
