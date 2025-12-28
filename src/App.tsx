@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, type FormEvent } from 'react'
+import { useRef, useState, useEffect, type FormEvent, type ReactNode } from 'react'
 import './App.css'
 
 const API_BASE_URL =
@@ -24,6 +24,16 @@ const buildShortUrl = (domain: string, slug: string) =>
   `${normalizeBase(domain)}/${slug}`
 
 const createSlug = () => Math.random().toString(36).slice(2, 8)
+
+const CONTACT_EMAIL = 'the.compstud.guy@universitea.shop'
+const AUTHOR_GITHUB_URL = 'https://github.com/thecompstudguy'
+const REPO_BACKEND_URL = 'https://github.com/thecompstudguy/url-shortener-be'
+const REPO_FRONTEND_URL = 'https://github.com/thecompstudguy/url-shortener-fe'
+
+const HOME_DOCUMENT_TITLE = 'URL Shortener — Fast, clean short links'
+const TERMS_DOCUMENT_TITLE = 'Terms of Use · URL Shortener'
+const PRIVACY_DOCUMENT_TITLE = 'Privacy Policy · URL Shortener'
+const LEGAL_LAST_UPDATED = '2025-12-28'
 
 const UNIVERSITEA_BANNER_URL = 'https://assets.universitea.shop/banner-logo.png'
 const UNIVERSITEA_REDDIT_DISCUSSION_URL =
@@ -448,7 +458,264 @@ const GitHubIcon = ({ size = 18 }: { size?: number }) => (
   </svg>
 )
 
-function App() {
+const SiteHeader = () => {
+  const [logoFailed, setLogoFailed] = useState(false)
+
+  return (
+    <header className="header">
+      <div className="brand">
+        {logoFailed ? (
+          <div className="brand-mark" role="img" aria-label="URL Shortener">
+            <span className="brand-mark__left">URL</span>
+            <span className="brand-mark__right">shortener</span>
+            <span className="brand-mark__icon" aria-hidden="true">
+              <svg viewBox="0 0 48 40">
+                <path d="M12 20h14" />
+                <path d="M22 12l12 8-12 8" />
+                <path d="M12 28a10 10 0 1 1 0-16h6" />
+              </svg>
+            </span>
+          </div>
+        ) : (
+          <img
+            className="brand-logo"
+            src="/url-shortener-logo.png"
+            alt="URL Shortener logo"
+            onError={() => setLogoFailed(true)}
+          />
+        )}
+        <a
+          className="brand-kicker"
+          href={AUTHOR_GITHUB_URL}
+          target="_blank"
+          rel="noreferrer"
+        >
+          By TheCompSTUDGuy
+        </a>
+      </div>
+      <div className="repo-links" aria-label="Project repositories">
+        <span className="repo-links-label">GitHub repos</span>
+        <div className="repo-links-list">
+          <a className="repo-link" href={REPO_BACKEND_URL} target="_blank" rel="noreferrer">
+            <GitHubIcon />
+            url-shortener-be
+          </a>
+          <a className="repo-link" href={REPO_FRONTEND_URL} target="_blank" rel="noreferrer">
+            <GitHubIcon />
+            url-shortener-fe
+          </a>
+        </div>
+      </div>
+    </header>
+  )
+}
+
+const SiteFooter = () => (
+  <footer className="footer">
+    <div className="footer-content">
+      <span>Built for fast sharing and crisp short links.</span>
+      <span>
+        Made by{' '}
+        <a href={AUTHOR_GITHUB_URL} target="_blank" rel="noreferrer">
+          TheCompSTUDGuy
+        </a>
+        {' · '}
+        Contact:{' '}
+        <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+        {' · '}
+        <a href="#/terms">Terms</a>
+        {' · '}
+        <a href="#/privacy">Privacy</a>
+      </span>
+    </div>
+  </footer>
+)
+
+const LegalLayout = ({
+  title,
+  children,
+}: {
+  title: string
+  children: ReactNode
+}) => (
+  <div className="page legal-page">
+    <SiteHeader />
+    <main className="main legal-main">
+      <section className="legal-panel" aria-labelledby="legal-title">
+        <a className="legal-back" href="#/">
+          ← Back to URL Shortener
+        </a>
+        <h1 className="legal-title" id="legal-title">
+          {title}
+        </h1>
+        <p className="legal-updated">Last updated: {LEGAL_LAST_UPDATED}</p>
+        <div className="legal-body">{children}</div>
+      </section>
+    </main>
+    <SiteFooter />
+  </div>
+)
+
+const TermsPage = () => (
+  <LegalLayout title="Terms of Use">
+    <p>
+      These Terms of Use apply to this URL Shortener site and its related API
+      service (the “Service”). By using the Service, you agree to these terms.
+    </p>
+    <p>
+      Questions? Email <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+    </p>
+
+    <h2>Use at your own risk</h2>
+    <p>
+      The Service is provided “as is” and “as available”, without warranties of any
+      kind. We do not guarantee that the Service will be uninterrupted, secure, or
+      error-free.
+    </p>
+
+    <h2>Acceptable use</h2>
+    <p>You agree not to use the Service to create or share links that:</p>
+    <ul>
+      <li>are illegal, malicious, or deceptive (malware, phishing, scams, fraud),</li>
+      <li>violate someone else’s rights (copyright, trademarks, privacy),</li>
+      <li>are used to harass, threaten, or harm others,</li>
+      <li>attempt to bypass security, rate limits, or abuse protections.</li>
+    </ul>
+
+    <h2>Link safety</h2>
+    <p>
+      Shortened links can point to third-party websites. We do not control those
+      destinations and are not responsible for their content, availability, or
+      policies. Use caution before clicking links, even short ones.
+    </p>
+
+    <h2>Moderation and removal</h2>
+    <p>
+      We may remove, disable, or refuse to generate short links at any time, for
+      any reason (including abuse prevention, legal compliance, or operational
+      safety).
+    </p>
+
+    <h2>Limitation of liability</h2>
+    <p>
+      To the maximum extent permitted by law, we are not liable for any indirect,
+      incidental, special, consequential, or punitive damages, or any loss of data,
+      revenue, or profits arising from your use of the Service.
+    </p>
+
+    <h2>Changes</h2>
+    <p>
+      We may update these Terms from time to time. Continued use of the Service
+      after changes means you accept the updated Terms.
+    </p>
+  </LegalLayout>
+)
+
+const PrivacyPage = () => (
+  <LegalLayout title="Privacy Policy">
+    <p>
+      This Privacy Policy explains what information this URL Shortener site stores,
+      what it sends to the backend API, and what third parties may receive when you
+      use it.
+    </p>
+    <p>
+      Questions? Email <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+    </p>
+
+    <h2>What this site stores in your browser</h2>
+
+    <h3>Recent links (localStorage)</h3>
+    <ul>
+      <li>
+        The site stores your “Recent links” history in your browser using{' '}
+        <code>localStorage</code> under the key <code>url-shortener-history</code>.
+      </li>
+      <li>
+        This can include the original (long) URL, the shortened URL, and timestamps.
+      </li>
+      <li>
+        This data stays on your device until you clear your browser’s site data (or
+        remove it from localStorage).
+      </li>
+    </ul>
+
+    <h3>UniversiTEA intro modal (cookie)</h3>
+    <ul>
+      <li>
+        The site sets one small cookie named <code>universitea_intro_seen</code>{' '}
+        after you dismiss the UniversiTEA announcement modal.
+      </li>
+      <li>Purpose: remember not to show the modal again on your device.</li>
+      <li>
+        This cookie is functional (not advertising/analytics) and is set with{' '}
+        <code>SameSite=Lax</code>.
+      </li>
+    </ul>
+
+    <h2>What is sent to the backend API</h2>
+    <p>
+      When you shorten a URL, the site sends the URL you entered to the configured
+      backend API endpoint (<code>POST /url-shortener</code>). The API base URL is
+      configured via environment variables on the site deployment.
+    </p>
+    <p>
+      The backend may receive and log standard request data (for example: IP
+      address, user agent, timestamps, and the submitted URL). The frontend cannot
+      control the backend’s retention policies.
+    </p>
+
+    <h2>What the site does not do</h2>
+    <ul>
+      <li>No ad tracking pixels.</li>
+      <li>No selling of your data.</li>
+      <li>No intentional collection of “sensitive personal information”.</li>
+    </ul>
+
+    <h2>Third-party services and links</h2>
+    <p>Using this site may result in requests to third parties:</p>
+    <ul>
+      <li>
+        <strong>Google Fonts</strong> (fonts are loaded from{' '}
+        <code>fonts.googleapis.com</code> / <code>fonts.gstatic.com</code>).
+      </li>
+      <li>
+        <strong>GitHub</strong> and <strong>Reddit</strong> links (only when you
+        click them).
+      </li>
+      <li>Any destination website you open via a short or original URL.</li>
+    </ul>
+    <p>
+      Those services have their own privacy policies and may collect standard web
+      request data.
+    </p>
+
+    <h2>Your choices</h2>
+    <ul>
+      <li>
+        Clear “Recent links”: clear this site’s storage in your browser settings (or
+        delete <code>url-shortener-history</code> from localStorage).
+      </li>
+      <li>
+        Clear the UniversiTEA modal cookie: delete this site’s cookies in your
+        browser settings.
+      </li>
+    </ul>
+
+    <h2>Security</h2>
+    <p>
+      We try to keep things safe, but no website can guarantee perfect security.
+      Avoid shortening URLs that contain secrets (tokens, private IDs, etc.).
+    </p>
+
+    <h2>Changes to this policy</h2>
+    <p>
+      This policy may be updated from time to time. The “Last updated” date will
+      change when it does.
+    </p>
+  </LegalLayout>
+)
+
+function HomePage() {
   const [longUrl, setLongUrl] = useState('')
   const [result, setResult] = useState<ShortResult | null>(null)
   const [showUniversiTeaModal, setShowUniversiTeaModal] = useState(false)
@@ -470,12 +737,11 @@ function App() {
   }, [history])
   const [errorMessage, setErrorMessage] = useState('')
   const [copiedId, setCopiedId] = useState<string | null>(null)
-  const [logoFailed, setLogoFailed] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const modalCloseRef = useRef<HTMLButtonElement>(null)
 
   const dismissUniversiTeaModal = () => {
-    setCookie(UNIVERSITEA_INTRO_COOKIE, '1', 365)
+    setCookie(UNIVERSITEA_INTRO_COOKIE, '1', 10 / (24 * 60))
     setShowUniversiTeaModal(false)
   }
 
@@ -486,7 +752,7 @@ function App() {
 
     const timeoutId = window.setTimeout(() => {
       setShowUniversiTeaModal(true)
-    }, 1000)
+    }, 2000)
 
     return () => window.clearTimeout(timeoutId)
   }, [])
@@ -795,7 +1061,7 @@ echo $short . PHP_EOL;`
               </a>
               <a
                 className="modal-secondary"
-                href="mailto:the.compstud.guy@universitea.shop"
+                href={`mailto:${CONTACT_EMAIL}`}
               >
                 Contact
               </a>
@@ -803,61 +1069,7 @@ echo $short . PHP_EOL;`
           </div>
         </div>
       ) : null}
-      <header className="header">
-        <div className="brand">
-          {logoFailed ? (
-            <div className="brand-mark" role="img" aria-label="URL Shortener">
-              <span className="brand-mark__left">URL</span>
-              <span className="brand-mark__right">shortener</span>
-              <span className="brand-mark__icon" aria-hidden="true">
-                <svg viewBox="0 0 48 40">
-                  <path d="M12 20h14" />
-                  <path d="M22 12l12 8-12 8" />
-                  <path d="M12 28a10 10 0 1 1 0-16h6" />
-                </svg>
-              </span>
-            </div>
-          ) : (
-            <img
-              className="brand-logo"
-              src="/url-shortener-logo.png"
-              alt="URL Shortener logo"
-              onError={() => setLogoFailed(true)}
-            />
-          )}
-          <a
-            className="brand-kicker"
-            href="https://github.com/thecompstudguy"
-            target="_blank"
-            rel="noreferrer"
-          >
-            By TheCompSTUDGuy
-          </a>
-        </div>
-        <div className="repo-links" aria-label="Project repositories">
-          <span className="repo-links-label">GitHub repos</span>
-          <div className="repo-links-list">
-            <a
-              className="repo-link"
-              href="https://github.com/thecompstudguy/url-shortener-be"
-              target="_blank"
-              rel="noreferrer"
-            >
-              <GitHubIcon />
-              url-shortener-be
-            </a>
-            <a
-              className="repo-link"
-              href="https://github.com/thecompstudguy/url-shortener-fe"
-              target="_blank"
-              rel="noreferrer"
-            >
-              <GitHubIcon />
-              url-shortener-fe
-            </a>
-          </div>
-        </div>
-      </header>
+      <SiteHeader />
 
       <main className="main">
         <section className="hero">
@@ -1089,28 +1301,72 @@ echo $short . PHP_EOL;`
         </div>
       </section>
 
-      <footer className="footer">
-        <div className="footer-content">
-          <span>Built for fast sharing and crisp short links.</span>
-          <span>
-            Made by{' '}
-            <a
-              href="https://github.com/thecompstudguy"
-              target="_blank"
-              rel="noreferrer"
-            >
-              TheCompSTUDGuy
-            </a>
-            {' · '}
-            Contact:{' '}
-            <a href="mailto:the.compstud.guy@universitea.shop">
-              the.compstud.guy@universitea.shop
-            </a>
-          </span>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   )
+}
+
+type AppRoute = 'home' | 'privacy' | 'terms'
+
+const getRouteFromLocation = (): AppRoute => {
+  if (typeof window === 'undefined') {
+    return 'home'
+  }
+
+  const hashPath = window.location.hash.replace(/^#/, '').split('?')[0]
+  const rawPath = hashPath || window.location.pathname.split('?')[0]
+  const normalized = rawPath.replace(/\/+$/, '') || '/'
+
+  if (normalized === '/privacy') {
+    return 'privacy'
+  }
+
+  if (normalized === '/terms') {
+    return 'terms'
+  }
+
+  return 'home'
+}
+
+function App() {
+  const [route, setRoute] = useState<AppRoute>(() => getRouteFromLocation())
+
+  useEffect(() => {
+    const handleRouteChange = () => setRoute(getRouteFromLocation())
+    window.addEventListener('hashchange', handleRouteChange)
+    window.addEventListener('popstate', handleRouteChange)
+
+    return () => {
+      window.removeEventListener('hashchange', handleRouteChange)
+      window.removeEventListener('popstate', handleRouteChange)
+    }
+  }, [])
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+
+    if (route === 'privacy') {
+      document.title = PRIVACY_DOCUMENT_TITLE
+      return
+    }
+
+    if (route === 'terms') {
+      document.title = TERMS_DOCUMENT_TITLE
+      return
+    }
+
+    document.title = HOME_DOCUMENT_TITLE
+  }, [route])
+
+  if (route === 'privacy') {
+    return <PrivacyPage />
+  }
+
+  if (route === 'terms') {
+    return <TermsPage />
+  }
+
+  return <HomePage />
 }
 
 export default App
