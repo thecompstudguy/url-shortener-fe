@@ -69,7 +69,7 @@ const requestShortUrl = async (targetUrl: string): Promise<string> => {
   throw new Error('Missing short URL')
 }
 
-type CodeLanguage = 'bash' | 'javascript' | 'php' | 'json'
+type CodeLanguage = 'bash' | 'javascript' | 'php' | 'java' | 'json'
 
 type CodeTokenType =
   | 'text'
@@ -121,6 +121,60 @@ const PHP_KEYWORDS = new Set([
   'try',
 ])
 
+const JAVA_KEYWORDS = new Set([
+  'abstract',
+  'boolean',
+  'break',
+  'byte',
+  'case',
+  'catch',
+  'char',
+  'class',
+  'const',
+  'continue',
+  'default',
+  'do',
+  'double',
+  'else',
+  'enum',
+  'extends',
+  'false',
+  'final',
+  'finally',
+  'float',
+  'for',
+  'if',
+  'implements',
+  'import',
+  'instanceof',
+  'int',
+  'interface',
+  'long',
+  'native',
+  'new',
+  'null',
+  'package',
+  'private',
+  'protected',
+  'public',
+  'return',
+  'short',
+  'static',
+  'strictfp',
+  'super',
+  'switch',
+  'synchronized',
+  'this',
+  'throw',
+  'throws',
+  'transient',
+  'true',
+  'try',
+  'void',
+  'volatile',
+  'while',
+])
+
 const CURL_KEYWORDS = new Set(['curl', 'GET', 'POST', 'PUT', 'PATCH', 'DELETE'])
 
 const isDigit = (char: string) => char >= '0' && char <= '9'
@@ -161,11 +215,11 @@ const tokenizeCode = (code: string, language: CodeLanguage): CodeToken[] => {
     const char = code[index]
 
     const isLineCommentStart =
-      (language === 'javascript' || language === 'php') &&
+      (language === 'javascript' || language === 'php' || language === 'java') &&
       char === '/' &&
       code[index + 1] === '/'
     const isBlockCommentStart =
-      (language === 'javascript' || language === 'php') &&
+      (language === 'javascript' || language === 'php' || language === 'java') &&
       char === '/' &&
       code[index + 1] === '*'
 
@@ -281,6 +335,12 @@ const tokenizeCode = (code: string, language: CodeLanguage): CodeToken[] => {
       }
 
       if (language === 'php' && PHP_KEYWORDS.has(word)) {
+        push('keyword', word)
+        index = end
+        continue
+      }
+
+      if (language === 'java' && JAVA_KEYWORDS.has(word)) {
         push('keyword', word)
         index = end
         continue
@@ -459,6 +519,56 @@ function App() {
   const normalizedApiBaseUrl = normalizeBase(API_BASE_URL)
   const normalizedShortDomain = normalizeBase(SHORT_DOMAIN)
   const createUrlEndpoint = `${normalizedApiBaseUrl}/url-shortener`
+
+  const javaExample = `// Java 11+ (HttpClient). JSON parsing uses Jackson (jackson-databind).
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.Map;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class ShortenUrlExample {
+  public static void main(String[] args) throws Exception {
+    String endpoint = "${createUrlEndpoint}";
+    String shortDomain = "${normalizedShortDomain}";
+    String longUrl = "https://example.com";
+
+    HttpClient client = HttpClient.newHttpClient();
+    ObjectMapper mapper = new ObjectMapper();
+
+    String body = mapper.writeValueAsString(Map.of("url", longUrl));
+
+    HttpRequest request = HttpRequest.newBuilder()
+      .uri(URI.create(endpoint))
+      .header("Content-Type", "application/json")
+      .POST(HttpRequest.BodyPublishers.ofString(body))
+      .build();
+
+    HttpResponse<String> res = client.send(request, HttpResponse.BodyHandlers.ofString());
+    JsonNode json = mapper.readTree(res.body());
+
+    if (res.statusCode() < 200 || res.statusCode() >= 300) {
+      String message = json.path("error").path("message").asText(
+        json.path("message").asText("Unable to shorten")
+      );
+      throw new RuntimeException(message);
+    }
+
+    String url = json.path("data").path("url").asText("");
+    String shortcode = json.path("data").path("shortcode").asText("");
+
+    if (!url.isEmpty()) {
+      System.out.println(url);
+    } else if (!shortcode.isEmpty()) {
+      System.out.println(shortDomain + "/" + shortcode);
+    } else {
+      throw new RuntimeException("Missing short URL");
+    }
+  }
+}`
 
   const curlExample = `curl -X POST "${createUrlEndpoint}" \\
   -H "Content-Type: application/json" \\
@@ -796,6 +906,11 @@ echo $short . PHP_EOL;`
           <div className="api-guide-card">
             <h3>curl</h3>
             <CodeBlock code={curlExample} language="bash" />
+          </div>
+
+          <div className="api-guide-card">
+            <h3>Java</h3>
+            <CodeBlock code={javaExample} language="java" />
           </div>
 
           <div className="api-guide-card">
