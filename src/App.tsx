@@ -235,7 +235,9 @@ function App() {
                 </button>
               </div>
               <div className="result-meta">
-                <span className="truncate">{result.longUrl}</span>
+                <span className="truncate" title={result.longUrl}>
+                  {result.longUrl}
+                </span>
                 <button type="button" className="text-button" onClick={handleReset}>
                   Shorten another
                 </button>
@@ -275,8 +277,9 @@ function App() {
             {history.map((item) => (
               <li className="history-item" key={item.id}>
                 <div className="history-info">
-                  <span className="history-short">{item.shortUrl}</span>
-                  <span className="history-long truncate">{item.longUrl}</span>
+                  <span className="history-short" title={item.longUrl}>
+                    {item.shortUrl}
+                  </span>
                 </div>
                 <div className="history-actions">
                   <button
