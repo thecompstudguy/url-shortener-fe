@@ -503,13 +503,26 @@ echo $short . PHP_EOL;`
   "data": {
     "shortcode": "SB1gw",
     "originalUrl": "https://github.com/thecompstudguy/url-shortener-fe",
-    "url": "https://stl.games/SB1gw"
+    "url": "${normalizedShortDomain}/SB1gw"
   },
   "_meta": {}
 }`
 
   const sampleErrorResponse = `{
-  "message": "Invalid URL"
+  "status": "error",
+  "data": null,
+  "error": {
+    "code": "lesgo.utils.validateFields::MISSING_REQUIRED_URL",
+    "message": "Missing required 'url'",
+    "details": {
+      "field": {
+        "key": "url",
+        "type": "string",
+        "required": true
+      }
+    }
+  },
+  "_meta": {}
 }`
 
   return (
@@ -698,13 +711,9 @@ echo $short . PHP_EOL;`
 
         <div className="api-guide-meta">
           <div className="api-guide-meta-item">
-            <span className="api-guide-label">Base URL</span>
-            <span className="api-guide-value">{normalizedApiBaseUrl}</span>
-          </div>
-          <div className="api-guide-meta-item">
             <span className="api-guide-label">Endpoint</span>
             <span className="api-guide-value">
-              <code>POST /url-shortener</code>
+              <code>POST {createUrlEndpoint}</code>
             </span>
           </div>
           <div className="api-guide-meta-item">

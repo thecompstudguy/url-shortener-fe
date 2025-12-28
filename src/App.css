@@ -502,6 +502,7 @@
 .history-empty {
   margin: 16px 0 0;
   color: var(--muted);
+  text-align: center;
 }
 
 .api-guide {
