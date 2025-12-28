@@ -32,24 +32,36 @@ const requestShortUrl = async (targetUrl: string): Promise<string> => {
     return buildShortUrl(SHORT_DOMAIN, createSlug())
   }
 
-  const response = await fetch(`${normalizeBase(API_BASE_URL)}/shorten`, {
+  const response = await fetch(`${normalizeBase(API_BASE_URL)}/url-shortener`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ url: targetUrl }),
   })
 
+  let payload: {
+    status?: string
+    data?: { url?: string; shortcode?: string }
+    message?: string
+  } | null = null
+
+  try {
+    payload = (await response.json()) as typeof payload
+  } catch {
+    payload = null
+  }
+
   if (!response.ok) {
-    throw new Error('Unable to shorten')
+    throw new Error(payload?.message || 'Unable to shorten')
   }
 
-  const data = (await response.json()) as { shortUrl?: string; slug?: string }
-
-  if (data.shortUrl) {
-    return data.shortUrl
+  const shortUrl = payload?.data?.url
+  if (shortUrl) {
+    return shortUrl
   }
 
-  if (data.slug) {
-    return buildShortUrl(SHORT_DOMAIN, data.slug)
+  const shortcode = payload?.data?.shortcode
+  if (shortcode) {
+    return buildShortUrl(SHORT_DOMAIN, shortcode)
   }
 
   throw new Error('Missing short URL')
