@@ -38,6 +38,7 @@
 .header,
 .main,
 .history,
+.api-guide,
 .footer {
   position: relative;
   z-index: 1;
@@ -503,6 +504,182 @@
   color: var(--muted);
 }
 
+.api-guide {
+  margin-top: 48px;
+  padding: 28px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(26, 18, 12, 0.12);
+  background: rgba(255, 255, 255, 0.7);
+  animation: rise 0.7s ease 0.25s both;
+}
+
+.api-guide-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.api-guide-header h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 0.1em;
+  font-size: 2.2rem;
+  margin: 0 0 8px;
+}
+
+.api-guide-header p {
+  margin: 0 auto;
+  max-width: 64ch;
+  color: var(--muted);
+}
+
+.api-guide-header p + p {
+  margin-top: 10px;
+}
+
+.api-guide-meta {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.api-guide-meta-item {
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(26, 18, 12, 0.1);
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.api-guide-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.api-guide-value {
+  font-weight: 700;
+  color: var(--brand-black);
+  word-break: break-word;
+}
+
+.api-guide code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+    'Courier New', monospace;
+  font-size: 0.95em;
+}
+
+.api-guide-callout {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px dashed rgba(247, 154, 31, 0.4);
+  background: #fff5e8;
+  color: var(--brand-black);
+}
+
+.api-guide-callout strong {
+  font-weight: 900;
+}
+
+.api-guide-grid {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+.api-guide-card {
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(26, 18, 12, 0.1);
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.api-guide-card h3 {
+  margin: 0;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  color: var(--muted);
+}
+
+.api-guide-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.api-guide-card pre {
+  margin: 0;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--brand-black);
+  color: #fff;
+  overflow-x: auto;
+  border: 1px solid rgba(247, 154, 31, 0.2);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.api-guide-card pre code {
+  font-size: 1em;
+  white-space: pre;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.api-guide-card pre .token-comment {
+  color: rgba(255, 255, 255, 0.55);
+  font-style: italic;
+}
+
+.api-guide-card pre .token-string {
+  color: #fbbf24;
+}
+
+.api-guide-card pre .token-number {
+  color: #c4b5fd;
+}
+
+.api-guide-card pre .token-keyword {
+  color: #7dd3fc;
+  font-weight: 700;
+}
+
+.api-guide-card pre .token-function {
+  color: #34d399;
+}
+
+.api-guide-card pre .token-property {
+  color: #f472b6;
+}
+
+.api-guide-card pre .token-variable {
+  color: #fca5a5;
+}
+
+.api-guide-card pre .token-operator {
+  color: #e5e7eb;
+}
+
+.api-guide-card pre .token-punctuation {
+  color: #94a3b8;
+}
+
+.api-guide-card--request {
+  margin-top: 18px;
+}
+
+.api-guide-card--responses {
+  margin-top: 14px;
+}
+
 .footer {
   margin-top: 48px;
   display: flex;
@@ -623,7 +800,8 @@
 @media (prefers-reduced-motion: reduce) {
   .hero,
   .panel,
-  .history {
+  .history,
+  .api-guide {
     animation: none;
   }
 

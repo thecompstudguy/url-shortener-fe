@@ -27,8 +27,9 @@ const createSlug = () => Math.random().toString(36).slice(2, 8)
 
 interface ApiResponse {
   status?: string
-  data?: { url?: string; shortcode?: string }
+  data?: { url?: string; shortcode?: string; originalUrl?: string }
   message?: string
+  _meta?: Record<string, unknown>
 }
 
 const requestShortUrl = async (targetUrl: string): Promise<string> => {
@@ -66,6 +67,277 @@ const requestShortUrl = async (targetUrl: string): Promise<string> => {
   }
 
   throw new Error('Missing short URL')
+}
+
+type CodeLanguage = 'bash' | 'javascript' | 'php' | 'json'
+
+type CodeTokenType =
+  | 'text'
+  | 'comment'
+  | 'string'
+  | 'number'
+  | 'keyword'
+  | 'function'
+  | 'property'
+  | 'variable'
+  | 'operator'
+  | 'punctuation'
+
+type CodeToken = { type: CodeTokenType; value: string }
+
+const JS_KEYWORDS = new Set([
+  'async',
+  'await',
+  'catch',
+  'const',
+  'else',
+  'false',
+  'finally',
+  'function',
+  'if',
+  'let',
+  'new',
+  'null',
+  'return',
+  'throw',
+  'true',
+  'try',
+  'var',
+])
+
+const PHP_KEYWORDS = new Set([
+  'catch',
+  'echo',
+  'else',
+  'false',
+  'finally',
+  'function',
+  'if',
+  'new',
+  'null',
+  'return',
+  'throw',
+  'true',
+  'try',
+])
+
+const CURL_KEYWORDS = new Set(['curl', 'GET', 'POST', 'PUT', 'PATCH', 'DELETE'])
+
+const isDigit = (char: string) => char >= '0' && char <= '9'
+const isAlpha = (char: string) =>
+  (char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z')
+const isIdentifierStart = (char: string) => isAlpha(char) || char === '_' || char === '$'
+const isIdentifierPart = (char: string) =>
+  isIdentifierStart(char) || isDigit(char)
+
+const tokenizeCode = (code: string, language: CodeLanguage): CodeToken[] => {
+  const tokens: CodeToken[] = []
+  const push = (type: CodeTokenType, value: string) => {
+    if (!value) return
+    const last = tokens[tokens.length - 1]
+    if (last?.type === type) {
+      last.value += value
+      return
+    }
+    tokens.push({ type, value })
+  }
+
+  const punctuationChars = new Set(['{', '}', '[', ']', '(', ')', ',', '.', ':', ';'])
+  const operatorChars = new Set(['=', '+', '-', '*', '/', '!', '?', '<', '>', '|', '&', '\\'])
+  const twoCharOperators = new Set(['=>', '==', '!=', '&&', '||', '??'])
+
+  const peekNonWhitespace = (start: number) => {
+    for (let index = start; index < code.length; index += 1) {
+      const char = code[index]
+      if (char !== ' ' && char !== '\t' && char !== '\n' && char !== '\r') {
+        return { char, index }
+      }
+    }
+    return null
+  }
+
+  let index = 0
+  while (index < code.length) {
+    const char = code[index]
+
+    const isLineCommentStart =
+      (language === 'javascript' || language === 'php') &&
+      char === '/' &&
+      code[index + 1] === '/'
+    const isBlockCommentStart =
+      (language === 'javascript' || language === 'php') &&
+      char === '/' &&
+      code[index + 1] === '*'
+
+    if (language === 'bash' && char === '#') {
+      const lineEnd = code.indexOf('\n', index)
+      const end = lineEnd === -1 ? code.length : lineEnd
+      push('comment', code.slice(index, end))
+      index = end
+      continue
+    }
+
+    if (isLineCommentStart) {
+      const lineEnd = code.indexOf('\n', index)
+      const end = lineEnd === -1 ? code.length : lineEnd
+      push('comment', code.slice(index, end))
+      index = end
+      continue
+    }
+
+    if (isBlockCommentStart) {
+      const endIndex = code.indexOf('*/', index + 2)
+      const end = endIndex === -1 ? code.length : endIndex + 2
+      push('comment', code.slice(index, end))
+      index = end
+      continue
+    }
+
+    const stringDelimiter =
+      char === '"' || char === "'" || (language === 'javascript' && char === '`')
+    if (stringDelimiter) {
+      const delimiter = char
+      let end = index + 1
+      while (end < code.length) {
+        const current = code[end]
+        if (current === '\\') {
+          end += 2
+          continue
+        }
+        if (current === delimiter) {
+          end += 1
+          break
+        }
+        end += 1
+      }
+      const raw = code.slice(index, end)
+      if (language === 'json' && delimiter === '"') {
+        const next = peekNonWhitespace(end)
+        push(next?.char === ':' ? 'property' : 'string', raw)
+      } else {
+        push('string', raw)
+      }
+      index = end
+      continue
+    }
+
+    if (language === 'bash' && char === '-' && code[index + 1] && code[index + 1] !== ' ') {
+      let end = index + 1
+      while (end < code.length) {
+        const current = code[end]
+        if (current === ' ' || current === '\t' || current === '\n' || current === '\r') {
+          break
+        }
+        end += 1
+      }
+      push('keyword', code.slice(index, end))
+      index = end
+      continue
+    }
+
+    if (isDigit(char)) {
+      let end = index + 1
+      while (end < code.length) {
+        const current = code[end]
+        if (!isDigit(current) && current !== '.') {
+          break
+        }
+        end += 1
+      }
+      push('number', code.slice(index, end))
+      index = end
+      continue
+    }
+
+    if (char === '$' && language === 'php') {
+      let end = index + 1
+      while (end < code.length && isIdentifierPart(code[end])) {
+        end += 1
+      }
+      push('variable', code.slice(index, end))
+      index = end
+      continue
+    }
+
+    if (isIdentifierStart(char)) {
+      let end = index + 1
+      while (end < code.length && isIdentifierPart(code[end])) {
+        end += 1
+      }
+
+      const word = code.slice(index, end)
+      const next = peekNonWhitespace(end)
+
+      if (language === 'bash' && CURL_KEYWORDS.has(word)) {
+        push('keyword', word)
+        index = end
+        continue
+      }
+
+      if (language === 'javascript' && JS_KEYWORDS.has(word)) {
+        push('keyword', word)
+        index = end
+        continue
+      }
+
+      if (language === 'php' && PHP_KEYWORDS.has(word)) {
+        push('keyword', word)
+        index = end
+        continue
+      }
+
+      if (next?.char === '(') {
+        push('function', word)
+        index = end
+        continue
+      }
+
+      push('text', word)
+      index = end
+      continue
+    }
+
+    if (punctuationChars.has(char)) {
+      push('punctuation', char)
+      index += 1
+      continue
+    }
+
+    if (operatorChars.has(char)) {
+      const twoChar = code.slice(index, index + 2)
+      if (twoCharOperators.has(twoChar)) {
+        push('operator', twoChar)
+        index += 2
+        continue
+      }
+      push('operator', char)
+      index += 1
+      continue
+    }
+
+    push('text', char)
+    index += 1
+  }
+
+  return tokens
+}
+
+const CodeBlock = ({ code, language }: { code: string; language: CodeLanguage }) => {
+  const tokens = tokenizeCode(code, language)
+  return (
+    <pre className={`code-block language-${language}`}>
+      <code>
+        {tokens.map((token, tokenIndex) => (
+          <span
+            key={`${language}-${tokenIndex}`}
+            className={token.type === 'text' ? undefined : `token token-${token.type}`}
+          >
+            {token.value}
+          </span>
+        ))}
+      </code>
+    </pre>
+  )
 }
 
 function App() {
@@ -166,6 +438,79 @@ function App() {
     setErrorMessage('')
     inputRef.current?.focus()
   }
+
+  const normalizedApiBaseUrl = normalizeBase(API_BASE_URL)
+  const normalizedShortDomain = normalizeBase(SHORT_DOMAIN)
+  const createUrlEndpoint = `${normalizedApiBaseUrl}/url-shortener`
+
+  const curlExample = `curl -X POST "${createUrlEndpoint}" \\
+  -H "Content-Type: application/json" \\
+  -d '{"url":"https://example.com"}'`
+
+  const javascriptExample = `const API_BASE_URL = '${normalizedApiBaseUrl}'
+const SHORT_DOMAIN = '${normalizedShortDomain}'
+
+async function shortenUrl(longUrl) {
+  const res = await fetch(API_BASE_URL + '/url-shortener', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ url: longUrl }),
+  })
+
+  const json = await res.json().catch(() => null)
+  if (!res.ok) throw new Error(json?.message || 'Unable to shorten')
+
+  return json?.data?.url || (SHORT_DOMAIN + '/' + json?.data?.shortcode)
+}
+
+shortenUrl('https://example.com').then(console.log)`
+
+  const phpExample = `<?php
+
+$apiBaseUrl = '${normalizedApiBaseUrl}';
+$shortDomain = '${normalizedShortDomain}';
+$longUrl = 'https://example.com';
+
+$payload = json_encode(['url' => $longUrl]);
+
+$ch = curl_init($apiBaseUrl . '/url-shortener');
+curl_setopt_array($ch, [
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_POST => true,
+  CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+  CURLOPT_POSTFIELDS => $payload,
+]);
+
+$body = curl_exec($ch);
+$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+curl_close($ch);
+
+$json = json_decode($body, true);
+
+if ($httpCode < 200 || $httpCode >= 300) {
+  throw new Exception($json['message'] ?? 'Unable to shorten');
+}
+
+$short = $json['data']['url'] ?? ($shortDomain . '/' . $json['data']['shortcode']);
+echo $short . PHP_EOL;`
+
+  const requestBodyExample = `{
+  "url": "https://example.com"
+}`
+
+  const sampleSuccessResponse = `{
+  "status": "success",
+  "data": {
+    "shortcode": "SB1gw",
+    "originalUrl": "https://github.com/thecompstudguy/url-shortener-fe",
+    "url": "https://stl.games/SB1gw"
+  },
+  "_meta": {}
+}`
+
+  const sampleErrorResponse = `{
+  "message": "Invalid URL"
+}`
 
   return (
     <div className="page">
@@ -334,6 +679,87 @@ function App() {
             No links yet. Your latest shortened URLs will appear here.
           </p>
         )}
+      </section>
+
+      <section className="api-guide" aria-labelledby="api-guide-title">
+        <div className="api-guide-header">
+          <h2 id="api-guide-title">API guide</h2>
+          <p>
+            Need short links for a project, a hackathon demo, or your group chat?
+            Same. Here’s the cheat sheet: send a long URL to the backend and it
+            hands you back a clean short one.
+          </p>
+          <p>
+            Try it, test it, and “abuse” it (in the friendly, caffeine-fueled
+            way). Toss it weird URLs, copy/paste like it’s finals week — just be
+            nice to your own server.
+          </p>
+        </div>
+
+        <div className="api-guide-meta">
+          <div className="api-guide-meta-item">
+            <span className="api-guide-label">Base URL</span>
+            <span className="api-guide-value">{normalizedApiBaseUrl}</span>
+          </div>
+          <div className="api-guide-meta-item">
+            <span className="api-guide-label">Endpoint</span>
+            <span className="api-guide-value">
+              <code>POST /url-shortener</code>
+            </span>
+          </div>
+          <div className="api-guide-meta-item">
+            <span className="api-guide-label">Content type</span>
+            <span className="api-guide-value">
+              <code>application/json</code>
+            </span>
+          </div>
+        </div>
+
+        {isPlaceholderApi(API_BASE_URL) ? (
+          <div className="api-guide-callout" role="note">
+            <strong>Heads up:</strong> <code>VITE_API_BASE_URL</code> is set to a
+            placeholder value, so the app is generating demo short links locally.
+            Point it at your backend to use the real API.
+          </div>
+        ) : null}
+
+        <div className="api-guide-card api-guide-card--request">
+          <h3>Request body</h3>
+          <p>Send JSON with a single field: the URL you want to shorten.</p>
+          <CodeBlock code={requestBodyExample} language="json" />
+        </div>
+
+        <div className="api-guide-grid">
+          <div className="api-guide-card">
+            <h3>curl</h3>
+            <CodeBlock code={curlExample} language="bash" />
+          </div>
+
+          <div className="api-guide-card">
+            <h3>JavaScript</h3>
+            <CodeBlock code={javascriptExample} language="javascript" />
+          </div>
+
+          <div className="api-guide-card">
+            <h3>PHP</h3>
+            <CodeBlock code={phpExample} language="php" />
+          </div>
+        </div>
+
+        <div className="api-guide-card api-guide-card--responses">
+          <h3>Sample response</h3>
+          <p>
+            On success you’ll usually get both <code>data.shortcode</code> and a
+            full <code>data.url</code>, plus the original URL for vibes. Your
+            values will differ — don’t stress it.
+          </p>
+          <CodeBlock code={sampleSuccessResponse} language="json" />
+          <p>
+            If something goes sideways, you’ll typically get a message you can
+            show to the user.
+          </p>
+          <CodeBlock code={sampleErrorResponse} language="json" />
+        </div>
       </section>
 
       <footer className="footer">
