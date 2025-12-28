@@ -744,14 +744,22 @@ echo $short . PHP_EOL;`
         <div className="api-guide-header">
           <h2 id="api-guide-title">API guide</h2>
           <p>
-            Need short links for a project, a hackathon demo, or your group chat?
-            Same. Here’s the cheat sheet: send a long URL to the backend and it
-            hands you back a clean short one.
+            Built during late nights, caffeine-fueled sessions, and the kind of
+            crunch that comes with deadlines and submissions. This API is meant
+            to help with day-to-day work — projects, experiments, quick tools,
+            submissions, and anything you’re building to get something over the
+            line.
           </p>
           <p>
-            Try it, test it, and “abuse” it (in the friendly, caffeine-fueled
-            way). Toss it weird URLs, copy/paste like it’s finals week — just be
-            nice to your own server.
+            If you’ve been a professional for a while, feel free to{' '}
+            <em>abuse</em> the API — stress-test it like it’s headed for
+            production.
+          </p>
+          <p>
+            Throw edge cases at it. Toss in gnarly URLs. Try weird inputs. Mash
+            the button. If you break something interesting, that’s a win. Just
+            keep it ethical: no DDoS vibes, no legal chaos — report what you
+            find.
           </p>
         </div>
 
@@ -780,7 +788,7 @@ echo $short . PHP_EOL;`
 
         <div className="api-guide-card api-guide-card--request">
           <h3>Request body</h3>
-          <p>Send JSON with a single field: the URL you want to shorten.</p>
+          <p>Send JSON with one field: the URL you want to shrink into a tiny link.</p>
           <CodeBlock code={requestBodyExample} language="json" />
         </div>
 
@@ -804,14 +812,14 @@ echo $short . PHP_EOL;`
         <div className="api-guide-card api-guide-card--responses">
           <h3>Sample response</h3>
           <p>
-            On success you’ll usually get both <code>data.shortcode</code> and a
-            full <code>data.url</code>, plus the original URL for vibes. Your
-            values will differ — don’t stress it.
+            On success you’ll usually get a <code>data.shortcode</code>, the
+            original URL, and the full short URL. Your values will differ — the
+            format is what matters.
           </p>
           <CodeBlock code={sampleSuccessResponse} language="json" />
           <p>
-            If something goes sideways, you’ll typically get a message you can
-            show to the user.
+            If something goes sideways, you’ll get an error payload you can show
+            to the user (and maybe to your logs while you pretend you’re calm).
           </p>
           <CodeBlock code={sampleErrorResponse} language="json" />
         </div>
