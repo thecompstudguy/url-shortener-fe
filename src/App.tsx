@@ -837,6 +837,11 @@ echo $short . PHP_EOL;`
             >
               TheCompSTUDGuy
             </a>
+            {' · '}
+            Contact:{' '}
+            <a href="mailto:the.compstud.guy@universitea.shop">
+              the.compstud.guy@universitea.shop
+            </a>
           </span>
         </div>
       </footer>
