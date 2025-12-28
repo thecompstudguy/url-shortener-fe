@@ -35,6 +35,127 @@
   background: radial-gradient(circle, rgba(15, 12, 9, 0.35), rgba(15, 12, 9, 0));
 }
 
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(21, 17, 15, 0.72);
+  backdrop-filter: blur(8px);
+}
+
+.modal {
+  width: min(620px, 94vw);
+  max-height: min(720px, 92vh);
+  overflow: auto;
+  background: #fff;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+  padding: 22px;
+  position: relative;
+}
+
+.modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  border: 1px solid rgba(26, 18, 12, 0.18);
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  font-weight: 800;
+  color: var(--brand-black);
+  cursor: pointer;
+}
+
+.modal-close:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(247, 154, 31, 0.25);
+}
+
+.modal-banner {
+  width: 100%;
+  height: auto;
+  max-height: clamp(120px, 18vw, 170px);
+  object-fit: contain;
+  border-radius: 18px;
+  background: var(--brand-black);
+  padding: 20px 22px;
+  border: 1px solid rgba(247, 154, 31, 0.25);
+}
+
+.modal h2 {
+  margin: 18px 0 10px;
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 0.08em;
+  font-size: 2.2rem;
+  color: var(--brand-black);
+}
+
+.modal p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.modal-actions {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.modal-primary,
+.modal-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 18px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-weight: 900;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modal-primary {
+  border: none;
+  background: linear-gradient(120deg, var(--brand-orange), var(--brand-orange-deep));
+  color: #1a1109;
+}
+
+.modal-primary:hover {
+  transform: translateY(-1px);
+}
+
+.modal-secondary {
+  border: 1px solid rgba(26, 18, 12, 0.18);
+  background: transparent;
+  color: var(--brand-black);
+}
+
+.modal-secondary:hover {
+  transform: translateY(-1px);
+  border-color: rgba(247, 154, 31, 0.55);
+}
+
+.modal-primary:focus-visible,
+.modal-secondary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(247, 154, 31, 0.25);
+}
+
 .header,
 .main,
 .history,

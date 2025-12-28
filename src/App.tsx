@@ -25,6 +25,37 @@ const buildShortUrl = (domain: string, slug: string) =>
 
 const createSlug = () => Math.random().toString(36).slice(2, 8)
 
+const UNIVERSITEA_BANNER_URL = 'https://assets.universitea.shop/banner-logo.png'
+const UNIVERSITEA_REDDIT_DISCUSSION_URL =
+  'https://www.reddit.com/r/AteneodeCagayan/comments/1pn64bc/anonymous_teaconfession_app_prototype/'
+const UNIVERSITEA_INTRO_COOKIE = 'universitea_intro_seen'
+
+const getCookie = (name: string) => {
+  if (typeof document === 'undefined') {
+    return null
+  }
+
+  const prefix = `${encodeURIComponent(name)}=`
+  const entries = document.cookie.split('; ')
+
+  for (const entry of entries) {
+    if (entry.startsWith(prefix)) {
+      return decodeURIComponent(entry.slice(prefix.length))
+    }
+  }
+
+  return null
+}
+
+const setCookie = (name: string, value: string, maxAgeDays: number) => {
+  if (typeof document === 'undefined') {
+    return
+  }
+
+  const maxAgeSeconds = Math.floor(maxAgeDays * 24 * 60 * 60)
+  document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(value)}; max-age=${maxAgeSeconds}; path=/; samesite=lax`
+}
+
 interface ApiResponse {
   status?: string
   data?: { url?: string; shortcode?: string; originalUrl?: string }
@@ -420,6 +451,7 @@ const GitHubIcon = ({ size = 18 }: { size?: number }) => (
 function App() {
   const [longUrl, setLongUrl] = useState('')
   const [result, setResult] = useState<ShortResult | null>(null)
+  const [showUniversiTeaModal, setShowUniversiTeaModal] = useState(false)
   const [history, setHistory] = useState<ShortResult[]>(() => {
     const saved = localStorage.getItem('url-shortener-history')
     if (saved) {
@@ -440,6 +472,47 @@ function App() {
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const [logoFailed, setLogoFailed] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const modalCloseRef = useRef<HTMLButtonElement>(null)
+
+  const dismissUniversiTeaModal = () => {
+    setCookie(UNIVERSITEA_INTRO_COOKIE, '1', 365)
+    setShowUniversiTeaModal(false)
+  }
+
+  useEffect(() => {
+    if (getCookie(UNIVERSITEA_INTRO_COOKIE)) {
+      return
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setShowUniversiTeaModal(true)
+    }, 1000)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [])
+
+  useEffect(() => {
+    if (!showUniversiTeaModal) {
+      return
+    }
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    modalCloseRef.current?.focus()
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        dismissUniversiTeaModal()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [showUniversiTeaModal])
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -654,6 +727,82 @@ echo $short . PHP_EOL;`
 
   return (
     <div className="page">
+      {showUniversiTeaModal ? (
+        <div
+          className="modal-overlay"
+          role="presentation"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) {
+              dismissUniversiTeaModal()
+            }
+          }}
+        >
+          <div
+            className="modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="universitea-modal-title"
+            aria-describedby="universitea-modal-description universitea-modal-reddit"
+          >
+            <button
+              type="button"
+              className="modal-close"
+              onClick={dismissUniversiTeaModal}
+              ref={modalCloseRef}
+            >
+              Close
+            </button>
+            <img
+              className="modal-banner"
+              src={UNIVERSITEA_BANNER_URL}
+              alt="UniversiTEA banner"
+              loading="lazy"
+              decoding="async"
+            />
+            <h2 id="universitea-modal-title">UniversiTEA is coming soon</h2>
+            <p id="universitea-modal-description">
+              UniversiTEA is the project I’m working on next — a Telegram Mini App
+              for student-only, school-scoped anonymous posts and discussions.
+              It’s dropping soon. For now, I’m shipping this URL Shortener as a
+              clean little release first.
+            </p>
+            <p id="universitea-modal-reddit">
+              Want the context? Here’s the{' '}
+              <a
+                href={UNIVERSITEA_REDDIT_DISCUSSION_URL}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Reddit discussion
+              </a>
+              .
+            </p>
+            <div className="modal-actions">
+              <button
+                type="button"
+                className="modal-primary"
+                onClick={dismissUniversiTeaModal}
+              >
+                Got it
+              </button>
+              <a
+                className="modal-secondary"
+                href={UNIVERSITEA_REDDIT_DISCUSSION_URL}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Reddit discussion
+              </a>
+              <a
+                className="modal-secondary"
+                href="mailto:the.compstud.guy@universitea.shop"
+              >
+                Contact
+              </a>
+            </div>
+          </div>
+        </div>
+      ) : null}
       <header className="header">
         <div className="brand">
           {logoFailed ? (
