@@ -464,6 +464,18 @@
   color: var(--brand-black);
 }
 
+.history-short-link {
+  display: inline-block;
+  max-width: 100%;
+  text-decoration: underline;
+  text-decoration-color: rgba(247, 154, 31, 0.4);
+  text-underline-offset: 3px;
+}
+
+.history-short-link:hover {
+  text-decoration-color: rgba(247, 154, 31, 0.9);
+}
+
 .history-long {
   font-size: 0.85rem;
   color: var(--muted);

@@ -663,9 +663,15 @@ echo $short . PHP_EOL;`
             {history.map((item) => (
               <li className="history-item" key={item.id}>
                 <div className="history-info">
-                  <span className="history-short" title={item.longUrl}>
+                  <a
+                    className="history-short history-short-link"
+                    href={item.shortUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    title={item.longUrl}
+                  >
                     {item.shortUrl}
-                  </span>
+                  </a>
                 </div>
                 <div className="history-actions">
                   <button
@@ -677,7 +683,7 @@ echo $short . PHP_EOL;`
                   </button>
                   <a
                     className="mini-link"
-                    href={item.shortUrl}
+                    href={item.longUrl}
                     target="_blank"
                     rel="noreferrer"
                   >
