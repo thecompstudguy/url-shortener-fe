@@ -1,4 +1,4 @@
-import { useRef, useState, type FormEvent } from 'react'
+import { useRef, useState, useEffect, type FormEvent } from 'react'
 import './App.css'
 
 const API_BASE_URL =
@@ -6,7 +6,6 @@ const API_BASE_URL =
   'https://api.placeholder.urlshortener/v1'
 const SHORT_DOMAIN =
   import.meta.env.VITE_SHORT_DOMAIN?.trim() || 'https://u.short'
-const MAX_HISTORY = 5
 
 type ShortResult = {
   id: string
@@ -26,6 +25,12 @@ const buildShortUrl = (domain: string, slug: string) =>
 
 const createSlug = () => Math.random().toString(36).slice(2, 8)
 
+interface ApiResponse {
+  status?: string
+  data?: { url?: string; shortcode?: string }
+  message?: string
+}
+
 const requestShortUrl = async (targetUrl: string): Promise<string> => {
   if (isPlaceholderApi(API_BASE_URL)) {
     await new Promise((resolve) => setTimeout(resolve, 450))
@@ -38,14 +43,10 @@ const requestShortUrl = async (targetUrl: string): Promise<string> => {
     body: JSON.stringify({ url: targetUrl }),
   })
 
-  let payload: {
-    status?: string
-    data?: { url?: string; shortcode?: string }
-    message?: string
-  } | null = null
+  let payload: ApiResponse | null = null
 
   try {
-    payload = (await response.json()) as typeof payload
+    payload = (await response.json()) as ApiResponse
   } catch {
     payload = null
   }
@@ -70,8 +71,22 @@ const requestShortUrl = async (targetUrl: string): Promise<string> => {
 function App() {
   const [longUrl, setLongUrl] = useState('')
   const [result, setResult] = useState<ShortResult | null>(null)
-  const [history, setHistory] = useState<ShortResult[]>([])
+  const [history, setHistory] = useState<ShortResult[]>(() => {
+    const saved = localStorage.getItem('url-shortener-history')
+    if (saved) {
+      try {
+        return JSON.parse(saved)
+      } catch {
+        return []
+      }
+    }
+    return []
+  })
   const [isLoading, setIsLoading] = useState(false)
+
+  useEffect(() => {
+    localStorage.setItem('url-shortener-history', JSON.stringify(history))
+  }, [history])
   const [errorMessage, setErrorMessage] = useState('')
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const [logoFailed, setLogoFailed] = useState(false)
@@ -100,6 +115,19 @@ function App() {
       return
     }
 
+    // Check for duplicates
+    const existingEntry = history.find((item) => item.longUrl === normalized)
+    if (existingEntry) {
+      setResult(existingEntry)
+      setHistory((prev) => [
+        existingEntry,
+        ...prev.filter((item) => item.id !== existingEntry.id),
+      ])
+      setLongUrl('')
+      inputRef.current?.focus()
+      return
+    }
+
     setIsLoading(true)
     try {
       const shortUrl = await requestShortUrl(normalized)
@@ -111,7 +139,7 @@ function App() {
       }
 
       setResult(entry)
-      setHistory((prev) => [entry, ...prev].slice(0, MAX_HISTORY))
+      setHistory((prev) => [entry, ...prev])
       setLongUrl('')
       inputRef.current?.focus()
     } catch {
@@ -270,7 +298,7 @@ function App() {
       <section className="history">
         <div className="history-header">
           <h2>Recent links</h2>
-          <p>Revisit your last few shortened URLs without losing focus.</p>
+          <p>Revisit your shortened URLs without losing focus.</p>
         </div>
         {history.length ? (
           <ul className="history-list">
