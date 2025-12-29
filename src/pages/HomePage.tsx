@@ -55,11 +55,38 @@ export const HomePage = () => {
       return
     }
 
+    let timerDone = false
+    let imageDone = false
+
+    const tryShowModal = () => {
+      if (timerDone && imageDone) {
+        setShowUniversiTeaModal(true)
+      }
+    }
+
     const timeoutId = window.setTimeout(() => {
-      setShowUniversiTeaModal(true)
+      timerDone = true
+      tryShowModal()
     }, 2000)
 
-    return () => window.clearTimeout(timeoutId)
+    const img = new Image()
+    img.onload = () => {
+      imageDone = true
+      tryShowModal()
+    }
+    img.onerror = () => {
+      // If the image fails to load, we still show the modal after the delay
+      // to avoid blocking the announcement.
+      imageDone = true
+      tryShowModal()
+    }
+    img.src = UNIVERSITEA_BANNER_URL
+
+    return () => {
+      window.clearTimeout(timeoutId)
+      img.onload = null
+      img.onerror = null
+    }
   }, [])
 
   useEffect(() => {
@@ -327,7 +354,6 @@ echo $short . PHP_EOL;`
               className="modal-banner"
               src={UNIVERSITEA_BANNER_URL}
               alt="UniversiTEA banner"
-              loading="lazy"
               decoding="async"
             />
             <h2 id="universitea-modal-title">UniversiTEA is coming soon</h2>
