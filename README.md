@@ -1,87 +1,131 @@
 # URL Shortener Frontend
 
-A URL Shortener frontend that I intend to release before UniversiTEA.
+Frontend for a simple URL Shortener app — built as a lightweight SPA using **React**, **TypeScript**, and **Vite**.
 
-[View on GitHub](https://github.com/thecompstudguy/url-shortener-fe)
+This is a small side project I’m releasing ahead of a bigger one, mainly to:
+- practice clean frontend architecture
+- integrate with a real backend API
+- and not overthink things (for once)
 
-## Author
+---
 
-TheCompSTUDGuy <the.compstud.guy@universitea.shop>
+## What does this app do?
+
+- Accepts long URLs
+- Sends them to the backend API
+- Displays a clean, shortened link
+- Keeps things fast, minimal, and distraction-free
+
+No ads. No trackers. No dark UX patterns.  
+Just links doing link things.
+
+---
 
 ## Tech Stack
 
-React + TypeScript + Vite
+- **React**
+- **TypeScript**
+- **Vite**
+- **ESLint**
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Vite gives fast dev builds, hot reloads, and fewer reasons to cry during setup.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Prerequisites
 
-## React Compiler
+Before running this locally, make sure you have:
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+- **Node.js** (LTS recommended)
+- **npm** (comes with Node)
 
-Note: This will impact Vite dev & build performances.
+---
 
-## Expanding the ESLint configuration
+## Install & Run Locally
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+By default, the app will run on:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
 ```
+http://localhost:5173
+```
+
+---
+
+## Environment Variables
+
+This project uses **Vite environment variables** for configuration.
+
+Create a `.env` file in the root directory:
+
+```bash
+cp .env.example .env
+```
+
+### Required Variables
+
+```env
+VITE_API_BASE_URL=<API_BASE_URL>
+VITE_SHORT_DOMAIN=<SHORT_DOMAIN>
+```
+
+### What these are for
+
+- `VITE_API_BASE_URL`  
+  → The backend API endpoint used to create short URLs.
+
+- `VITE_SHORT_DOMAIN`  
+  → The base domain shown to users when displaying shortened links.
+
+⚠️ **Do not commit `.env` files**  
+They are intentionally ignored by Git.
+
+---
+
+## Project Structure (simplified)
+
+```
+src/
+├── components/     # UI components
+├── pages/          # Page-level views
+├── services/       # API calls
+├── utils/          # Helpers
+└── main.tsx
+```
+
+Clean enough for a side project, structured enough to scale if needed.
+
+---
+
+## Linting
+
+This project uses ESLint with TypeScript support.
+
+If you want stricter rules later (recommended for production), you can enable type-aware linting using:
+
+- `recommendedTypeChecked`
+- `strictTypeChecked`
+- `stylisticTypeChecked`
+
+(Current setup favors sanity over suffering.)
+
+---
+
+## Why this exists
+
+This project exists to:
+- ship something small but complete
+- practice frontend + backend integration
+- avoid tutorial hell
+- and prove that not every project needs 47 dependencies
+
+---
+
+## Author
+
+**TheCompSTUDGuy**  
+the.compstud.guy@universitea.shop
