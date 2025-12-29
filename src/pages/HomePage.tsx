@@ -356,23 +356,24 @@ echo $short . PHP_EOL;`
               alt="UniversiTEA banner"
               decoding="async"
             />
-            <h2 id="universitea-modal-title">UniversiTEA is coming soon</h2>
+            <h2 id="universitea-modal-title">UNIVERSITEA IS COMING SOON</h2>
             <p id="universitea-modal-description">
               UniversiTEA is the project I’m working on next — a Telegram Mini App
               for student-only, school-scoped anonymous posts and discussions.
-              It’s dropping soon. For now, I’m shipping this URL Shortener as a
-              clean little release first.
+              It’s coming soon, but the coming weeks are stacked with deadlines,
+              write-ups, and build work, so I’m releasing things incrementally.
             </p>
             <p id="universitea-modal-reddit">
-              Want the context? Here’s the{' '}
+              This URL Shortener goes out first as a small, polished release. If
+              you want the context behind UniversiTEA, the{' '}
               <a
                 href={UNIVERSITEA_REDDIT_DISCUSSION_URL}
                 target="_blank"
                 rel="noreferrer"
               >
                 Reddit discussion
-              </a>
-              .
+              </a>{' '}
+              is linked below.
             </p>
             <div className="modal-actions">
               <button
