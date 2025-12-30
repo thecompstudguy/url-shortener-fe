@@ -595,26 +595,19 @@ echo $short . PHP_EOL;`
           <CodeBlock code={requestBodyExample} language="json" />
         </div>
 
-        <div className="api-guide-grid">
-          <div className="api-guide-card">
-            <h3>curl</h3>
-            <CodeBlock code={curlExample} language="bash" />
-          </div>
+        <div className="api-guide-card api-guide-card--samples">
+          <h3>Code samples</h3>
+          <p>curl</p>
+          <CodeBlock code={curlExample} language="bash" />
 
-          <div className="api-guide-card">
-            <h3>Java</h3>
-            <CodeBlock code={javaExample} language="java" />
-          </div>
+          <p>Java</p>
+          <CodeBlock code={javaExample} language="java" />
 
-          <div className="api-guide-card">
-            <h3>JavaScript</h3>
-            <CodeBlock code={javascriptExample} language="javascript" />
-          </div>
+          <p>JavaScript</p>
+          <CodeBlock code={javascriptExample} language="javascript" />
 
-          <div className="api-guide-card">
-            <h3>PHP</h3>
-            <CodeBlock code={phpExample} language="php" />
-          </div>
+          <p>PHP</p>
+          <CodeBlock code={phpExample} language="php" />
         </div>
 
         <div className="api-guide-card api-guide-card--responses">

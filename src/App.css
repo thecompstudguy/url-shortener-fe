@@ -797,13 +797,6 @@
   font-weight: 900;
 }
 
-.api-guide-grid {
-  margin-top: 18px;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 14px;
-}
-
 .api-guide-card {
   padding: 18px;
   border-radius: 18px;
@@ -834,7 +827,8 @@
   border-radius: 16px;
   background: var(--brand-black);
   color: #fff;
-  overflow-x: auto;
+  overflow: auto;
+  max-height: 420px;
   border: 1px solid rgba(247, 154, 31, 0.2);
   font-size: 0.82rem;
   line-height: 1.45;
@@ -886,6 +880,10 @@
 
 .api-guide-card--request {
   margin-top: 18px;
+}
+
+.api-guide-card--samples {
+  margin-top: 14px;
 }
 
 .api-guide-card--responses {
